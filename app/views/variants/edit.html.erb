@@ -1,0 +1,4 @@
+<% content_for :title, "Edit #{@variant.name} — The Mix" %>
+<%= link_to "← Back to variant", @variant, class: "back-link" %>
+<div class="page-heading"><p class="eyebrow">REFINE THE RULES</p><h1>Edit <%= @variant.name %></h1><p>Keep your library ready for the next game night.</p></div>
+<%= render "form", variant: @variant %>

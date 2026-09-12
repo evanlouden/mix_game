@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "The Mix — Poker variant library" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+  </head>
+  <body>
+    <header class="site-header">
+      <%= link_to root_path, class: "brand" do %><span class="brand-mark">♠</span> THE MIX<span class="brand-divider"></span><span class="brand-caption">A better game night.</span><% end %>
+      <nav aria-label="Main navigation"><%= link_to "Variant library", variants_path, class: "nav-active" %><span class="edition">POKER, BEYOND HOLD’EM</span></nav>
+    </header>
+    <main class="container">
+      <% flash.each do |type, message| %><div class="flash <%= type %>" role="status"><%= message %></div><% end %>
+      <%= yield %>
+    </main>
+    <footer class="site-footer"><span>♠ &nbsp; THE MIX</span><span>A world of poker. One library.</span><span>Built for the next deal.</span></footer>
+  </body>
+</html>
