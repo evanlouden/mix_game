@@ -1,0 +1,16 @@
+<%= form_with model: [variant, sequence_step], class: "variant-form sequence-step-form" do |form| %>
+  <% if sequence_step.errors.any? %>
+    <div class="form-errors" role="alert"><strong>Please check these fields:</strong><ul><% sequence_step.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div>
+  <% end %>
+  <div class="form-actions form-actions-top"><span><%= sequence_step.persisted? ? "Position #{sequence_step.position}" : "Add this step to #{variant.name}" %></span><div><%= link_to "Cancel", variant, class: "button secondary" %><%= form.submit sequence_step.persisted? ? "Save step" : "Add step", class: "button primary" %></div></div>
+  <section class="form-section"><div class="form-section-heading"><span class="section-number"><%= sequence_step.position.to_s.rjust(2, "0") %></span><h2>Step details</h2></div><div class="form-grid">
+    <div class="field"><%= form.label :position, "Position" %><%= form.number_field :position, min: 1, step: 1, required: true %><small class="form-help">Adding at an existing position shifts that step and all later steps down.</small></div>
+    <div class="field"><%= form.label :action_type, "Action type" %><%= form.select :action_type, SequenceStep::TYPES.map { |value| [value.humanize, value] } %></div>
+    <div class="field"><%= form.label :card_scope, "Card scope" %><%= form.select :card_scope, SequenceStep::CARD_SCOPES.map { |value| [value.humanize, value] }, { include_blank: "Not applicable" } %></div>
+    <div class="field"><%= form.label :number_of_boards, "Boards" %><%= form.number_field :number_of_boards, min: 1, step: 1 %></div>
+    <div class="field"><%= form.label :cards_down, "Individual cards down" %><%= form.number_field :cards_down, min: 1, step: 1 %></div>
+    <div class="field"><%= form.label :cards_up, "Cards up" %><%= form.number_field :cards_up, min: 1, step: 1 %></div>
+    <div class="field"><%= form.label :min_cards, "Minimum cards" %><%= form.number_field :min_cards, min: 0, step: 1 %></div>
+    <div class="field"><%= form.label :max_cards, "Maximum cards" %><%= form.number_field :max_cards, min: 1, step: 1 %></div>
+  </div></section>
+<% end %>

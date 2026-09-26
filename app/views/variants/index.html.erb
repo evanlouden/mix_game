@@ -17,16 +17,17 @@
     <%= form.select :family, Variant::FAMILIES | @family_counts.keys.compact.sort, { include_blank: "All families", selected: params[:family] }, aria: { label: "Game family" } %>
     <%= form.select :betting_structure, ["Fixed-Limit", "Pot-Limit", "Big-Bet (PDF category)"], { include_blank: "All betting structures", selected: params[:betting_structure] }, aria: { label: "Betting structure" } %>
     <%= form.select :split_pot, [["Split pot", "Yes"], ["Single pot", "No"]], { include_blank: "All pot types", selected: params[:split_pot] }, aria: { label: "Pot type" } %>
+    <%= form.select :confirmed, [["Confirmed", "yes"], ["Needs review", "no"]], { include_blank: "All review status", selected: params[:confirmed] }, aria: { label: "Review status" } %>
     <%= form.submit "Filter", class: "button primary" %>
   <% end %>
-  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :betting_structure, :split_pot).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :betting_structure, :split_pot).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
+  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :betting_structure, :split_pot, :confirmed).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :betting_structure, :split_pot, :confirmed).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
   <% if @variants.empty? %>
     <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %> <%= link_to "Add variant", new_variant_path, class: "button primary" %></div>
   <% else %>
     <div class="variant-grid">
       <% @variants.each do |variant| %>
         <%= link_to variant, class: "variant-card" do %>
-          <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="format-badge"><%= { "fixed_limt" => "LIMIT", "pot_limit" => "POT LIMIT", "no_limit" => "NO LIMIT" }.fetch(variant.betting_format, variant.betting_structure.to_s.match?(/Fixed-Limit/i) ? "LIMIT" : "NO LIMIT") %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
+          <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="review-badge <%= variant.confirmed? ? "confirmed" : "needs-review" %>"><%= variant.confirmed? ? "CONFIRMED" : "REVIEW" %></span><span class="format-badge"><%= { "fixed_limt" => "LIMIT", "pot_limit" => "POT LIMIT", "no_limit" => "NO LIMIT" }.fetch(variant.betting_format, variant.betting_structure.to_s.match?(/Fixed-Limit/i) ? "LIMIT" : "NO LIMIT") %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
         <% end %>
       <% end %>
     </div>

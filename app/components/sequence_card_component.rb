@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SequenceCardComponent < ApplicationComponent
-  STATES = %w[down community discard draw].freeze
+  STATES = %w[down community discard draw expose].freeze
 
   def initialize(state:, count: 1)
     raise ArgumentError, "Unknown card state" unless STATES.include?(state.to_s)

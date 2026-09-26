@@ -1,0 +1,7 @@
+<% content_for :title, "Edit sequence step #{@sequence_step.position} — #{@variant.name}" %>
+<%= link_to "← Back to variant", @variant, class: "back-link" %>
+<div class="page-heading"><p class="eyebrow">SEQUENCE STEP <%= @sequence_step.position %></p><h1>Edit step <%= @sequence_step.position %></h1><p><%= @variant.name %></p></div>
+
+<%= render "form", variant: @variant, sequence_step: @sequence_step %>
+
+<section class="danger-zone"><div><h3>Delete this sequence step</h3><p>Remove step <%= @sequence_step.position %> from <%= @variant.name %>.</p></div><%= button_to "Delete step", variant_sequence_step_path(@variant, @sequence_step), method: :delete, class: "button danger", form: { data: { turbo_confirm: "Delete sequence step #{@sequence_step.position}? This cannot be undone." } } %></section>

@@ -5,14 +5,15 @@
     <section class="form-section hand-rules-editor"><div class="form-section-heading"><span class="section-number">HR</span><h2>Hand ranking rules</h2></div>
       <p class="form-help">Choose the ranking rule and Ace behavior for each pot.</p>
       <%= form.fields_for :hand_rules do |rule_form| %>
-        <div class="hand-rule-edit-row"><strong>Pot #<%= rule_form.object.pot_number %></strong><%= rule_form.hidden_field :id %><%= rule_form.select :rule, HandRule::RANKING_RULES.map { |value| [HandRule::RANKING_LABELS.fetch(value), value] }, {}, aria: { label: "Pot #{rule_form.object.pot_number} ranking rule" } %><%= rule_form.select :ace_behavior, HandRule::ACE_BEHAVIORS.map { |value| [value.humanize, value] }, { include_blank: "Ace behavior" }, aria: { label: "Pot #{rule_form.object.pot_number} Ace behavior" } %><%= rule_form.text_field :qualifier, placeholder: "Qualifier (e.g. 8 or better)", aria: { label: "Pot #{rule_form.object.pot_number} qualifier" } %></div>
+        <div class="hand-rule-edit-row"><div class="hand-rule-main"><strong>Pot #<%= rule_form.object.pot_number %></strong><%= rule_form.hidden_field :id %><%= rule_form.select :rule, HandRule::RANKING_RULES.map { |value| [HandRule::RANKING_LABELS.fetch(value), value] }, {}, aria: { label: "Pot #{rule_form.object.pot_number} ranking rule" } %><%= rule_form.select :ace_behavior, HandRule::ACE_BEHAVIORS.map { |value| [value.humanize, value] }, { include_blank: "Ace behavior" }, aria: { label: "Pot #{rule_form.object.pot_number} Ace behavior" } %></div><%= rule_form.text_field :qualifier, placeholder: "Qualifier (e.g. 8 or better)", aria: { label: "Pot #{rule_form.object.pot_number} qualifier" } %></div>
       <% end %>
     </section>
   <% end %>
+  <section class="form-section review-section"><div class="form-section-heading"><span class="section-number">✓</span><h2>Review</h2></div><div class="review-field"><%= form.check_box :confirmed %><%= form.label :confirmed, "Confirmed" %><small class="form-help">Mark this when the variant’s rules and sequence have been reviewed.</small></div></section>
   <% Variant::GROUPS.each_with_index do |(title, fields), index| %>
     <section class="form-section"><div class="form-section-heading"><span class="section-number">0<%= index + 1 %></span><h2><%= title %></h2></div><div class="form-grid">
       <% fields.each do |field| %>
-        <div class="field <%= 'wide' if Variant::LONG_FIELDS.include?(field) || field == :name %>">
+        <div class="field <%= 'wide' if Variant::LONG_FIELDS.include?(field) || field == :name || field.in?(%i[pot_1_hand_rule pot_2_hand_rule]) %>">
           <%= form.label field, "#{Variant::FIELDS[field]}#{' *' if %i[name family].include?(field)}" %>
           <% if field == :split_pot %>
             <%= form.select field, ["Yes", "No"], include_blank: "Not specified" %>

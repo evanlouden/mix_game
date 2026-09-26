@@ -1,7 +1,7 @@
 class HandRule < ApplicationRecord
   ACE_BEHAVIORS = %w[high low either].freeze
-  RANKING_RULES = %w[standard_high ace_to_five_low deuce_to_seven_low badugi badeucey pip_count_high pip_count_low].freeze
-  RANKING_LABELS = { "standard_high" => "Standard", "ace_to_five_low" => "A-5", "deuce_to_seven_low" => "2-7", "badugi" => "Badugi", "badeucey" => "Badeucey", "pip_count_high" => "Pip Count High", "pip_count_low" => "Pip Count Low" }.freeze
+  RANKING_RULES = %w[standard_high high_omaha ace_to_five_low deuce_to_seven_low badugi badeucey pip_count_high pip_count_low].freeze
+  RANKING_LABELS = { "standard_high" => "High (5 best)", "high_omaha" => "High (Omaha)", "ace_to_five_low" => "Low A-8", "deuce_to_seven_low" => "2-7", "badugi" => "Badugi", "badeucey" => "Badeucey", "pip_count_high" => "Pip Count High", "pip_count_low" => "Pip Count Low" }.freeze
   belongs_to :variant, inverse_of: :hand_rules
   before_validation :normalize_standard_high_ace_behavior
 
@@ -23,6 +23,6 @@ class HandRule < ApplicationRecord
   private
 
   def normalize_standard_high_ace_behavior
-    self.ace_behavior = "either" if rule == "standard_high"
+    self.ace_behavior = "either" if rule.in?(%w[standard_high high_omaha])
   end
 end

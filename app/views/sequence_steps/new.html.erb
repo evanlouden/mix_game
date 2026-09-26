@@ -1,0 +1,4 @@
+<% content_for :title, "Add sequence step — #{@variant.name}" %>
+<%= link_to "← Back to variant", @variant, class: "back-link" %>
+<div class="page-heading"><p class="eyebrow">NEW SEQUENCE STEP</p><h1>Add a sequence step</h1><p><%= @variant.name %></p></div>
+<%= render "form", variant: @variant, sequence_step: @sequence_step %>

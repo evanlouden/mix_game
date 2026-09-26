@@ -11,7 +11,7 @@ class Variant < ApplicationRecord
     high_hand: "High-Hand Mechanics", low_hand: "Low-Hand Mechanics",
     final_hand: "Final Hand / Construction", wild_cards: "Wild Cards", deck_modification: "Deck Modification",
     pot_1_qualifier: "Pot 1 Qualifier", pot_2_qualifier: "Pot 2 Qualifier",
-    action_order: "Action Order", special_mechanics: "Special Mechanics", best_hand: "Best Hand",
+    action_order: "Action Order", special_mechanics: "Special Mechanics", best_hand: "Best Hand", confirmed: "Confirmed",
     source_pages: "Source Pages", source_notes: "Source Notes", pot_1_hand_rule: "Pot 1 Hand Rule", pot_2_hand_rule: "Pot 2 Hand Rule"
   }.freeze
   GROUPS = {
@@ -41,6 +41,9 @@ class Variant < ApplicationRecord
     end
     %i[family betting_structure split_pot].each do |field|
       scope = scope.where(field => filters[field]) if filters[field].present?
+    end
+    if filters[:confirmed].present?
+      scope = scope.where(confirmed: filters[:confirmed] == "yes")
     end
     scope.order(:name, :betting_structure, :id)
   end

@@ -1,0 +1,9 @@
+<div class="sequence-track" aria-label="Sequence steps">
+  <% if labels.empty? %>
+    <div class="sequence-empty">Sequence details haven’t been added yet.</div>
+  <% else %>
+    <% labels.each do |label| %>
+      <div class="sequence-step"><span class="sequence-event"><%= label_markup(label) %></span></div>
+    <% end %>
+  <% end %>
+</div>

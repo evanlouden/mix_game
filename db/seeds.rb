@@ -46,16 +46,22 @@ Variant.transaction do
     end
     sequence = detail.fetch("sequence", [])
     if row["Variant"] == "6-Card Shodugi"
-      labels = ["6 down", "Separate 2 & 4 · Cap", "Bet", "Flop 3 cards", "Bet", "Badugi draw", "2 community cards", "Bet", "River", "Bet"]
-      labels.each_with_index { |label, position| variant.sequence_steps.create!(position: position + 1, action_type: label.start_with?("Bet") ? "betting" : "special", label: label) }
+      labels = ["6 down", "Separate 2 & 4 · Cap", "Bet", "Flop", "Bet", "Badugi draw", "Community", "Bet", "River", "Bet"]
+      card_counts = [6, nil, nil, 3, nil, nil, 2, nil, 1, nil]
+      labels.each_with_index do |label, position|
+        type = label.start_with?("Bet") ? "betting" : label == "Flop" || label == "Community" ? "deal" : "special"
+        unit = label == "Flop" || label == "Community" ? "community cards" : nil
+        variant.sequence_steps.create!(position: position + 1, action_type: type, card_scope: unit == "community cards" ? "community" : nil, cards_up: unit == "community cards" ? card_counts[position] : nil)
+      end
     else
       sequence.each_with_index do |event, position|
         next if event["event_name"].to_s.casecmp("Special mechanic").zero?
         type = event["event_type"].to_s.downcase
         community_cards = event["community_card_count"].to_i
         hole_cards = event["hole_card_count"].to_i
+        type = "deal" if type == "deal" && community_cards.positive?
         label = if type == "deal" && community_cards.positive?
-          "#{community_cards} community cards"
+          "Community"
         elsif type == "deal" && hole_cards.positive?
           "#{hole_cards} cards"
         elsif type == "betting"
@@ -65,7 +71,17 @@ Variant.transaction do
         else
           event["event_name"].presence || type.humanize
         end
-        variant.sequence_steps.create!(position: position + 1, action_type: SequenceStep::TYPES.include?(type) ? type : "special", label: label, quantity: community_cards.positive? ? community_cards : hole_cards.positive? ? hole_cards : nil, quantity_unit: community_cards.positive? ? "community cards" : hole_cards.positive? ? "cards" : nil, details: event["action_detail"].presence, source_pages: event["source_pages"])
+        min_cards = if type == "draw"
+          0
+        elsif type == "discard"
+          row["Variant"].to_s.match?(/\AScrotum(?: 8)?\z/i) ? 0 : 1
+        end
+        max_cards = if type == "draw"
+          row["Variant"].to_s.match?(/Badugi/i) ? 4 : row["Variant"].to_s.match?(/Dramaha/i) ? 2 : 5
+        elsif type == "discard"
+          row["Variant"].to_s.match?(/\AScrotum(?: 8)?\z/i) ? 5 : 1
+        end
+        variant.sequence_steps.create!(position: position + 1, action_type: SequenceStep::TYPES.include?(type) ? type : "special", card_scope: community_cards.positive? ? "community" : hole_cards.positive? || event["up_card_count"].to_i.positive? ? "individual" : nil, cards_down: hole_cards.positive? ? hole_cards : nil, cards_up: community_cards.positive? ? community_cards : event["up_card_count"].to_i.positive? ? event["up_card_count"].to_i : nil, min_cards: min_cards, max_cards: max_cards)
       end
     end
     workbook.fetch("hand_rules").select { |entry| entry["variant_id"] == source_id }.each do |entry|

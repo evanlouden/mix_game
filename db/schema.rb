@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_191000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_004000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,14 +36,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_191000) do
 
   create_table "sequence_steps", force: :cascade do |t|
     t.string "action_type", null: false
+    t.string "card_scope"
+    t.integer "cards_down"
+    t.integer "cards_up"
     t.datetime "created_at", null: false
-    t.text "details"
-    t.string "label", null: false
-    t.jsonb "metadata", default: {}, null: false
+    t.integer "max_cards"
+    t.integer "min_cards"
+    t.integer "number_of_boards"
     t.integer "position", null: false
-    t.integer "quantity"
-    t.string "quantity_unit"
-    t.string "source_pages"
     t.datetime "updated_at", null: false
     t.bigint "variant_id", null: false
     t.index ["action_type"], name: "index_sequence_steps_on_action_type"
@@ -69,6 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_191000) do
     t.string "betting_format"
     t.text "betting_structure"
     t.text "bring_in"
+    t.boolean "confirmed", default: false, null: false
     t.datetime "created_at", null: false
     t.text "deck_modification"
     t.string "family", null: false
