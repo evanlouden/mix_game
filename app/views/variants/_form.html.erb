@@ -1,36 +1,39 @@
 <%= form_with model: variant, class: "variant-form" do |form| %>
   <% if variant.errors.any? %><div class="form-errors" role="alert"><strong>Please check these fields:</strong><ul><% variant.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
   <div class="form-actions form-actions-top"><span>* Required fields. Leave unknown rules blank.</span><div><%= link_to "Cancel", variant.persisted? ? variant_path(variant) : variants_path, class: "button secondary" %><%= form.submit variant.persisted? ? "Save changes" : "Create variant", class: "button primary" %></div></div>
-  <% if variant.persisted? && variant.hand_rules.exists? %>
-    <section class="form-section hand-rules-editor"><div class="form-section-heading"><span class="section-number">HR</span><h2>Hand ranking rules</h2></div>
-      <p class="form-help">Choose the ranking rule and Ace behavior for each pot.</p>
-      <%= form.fields_for :hand_rules do |rule_form| %>
-        <div class="hand-rule-edit-row"><div class="hand-rule-main"><strong>Pot #<%= rule_form.object.pot_number %></strong><%= rule_form.hidden_field :id %><%= rule_form.select :rule, HandRule::RANKING_RULES.map { |value| [HandRule::RANKING_LABELS.fetch(value), value] }, {}, aria: { label: "Pot #{rule_form.object.pot_number} ranking rule" } %><%= rule_form.select :ace_behavior, HandRule::ACE_BEHAVIORS.map { |value| [value.humanize, value] }, { include_blank: "Ace behavior" }, aria: { label: "Pot #{rule_form.object.pot_number} Ace behavior" } %></div><%= rule_form.text_field :qualifier, placeholder: "Qualifier (e.g. 8 or better)", aria: { label: "Pot #{rule_form.object.pot_number} qualifier" } %></div>
-      <% end %>
-    </section>
-  <% end %>
-  <section class="form-section review-section"><div class="form-section-heading"><span class="section-number">✓</span><h2>Review</h2></div><div class="review-field"><%= form.check_box :confirmed %><%= form.label :confirmed, "Confirmed" %><small class="form-help">Mark this when the variant’s rules and sequence have been reviewed.</small></div></section>
-  <% Variant::GROUPS.each_with_index do |(title, fields), index| %>
-    <section class="form-section"><div class="form-section-heading"><span class="section-number">0<%= index + 1 %></span><h2><%= title %></h2></div><div class="form-grid">
+  <section class="form-section">
+  <div class="form-grid">
+    <div class="field wide"><%= form.label :name, "Name" %><%= form.text_field :name, required: true %></div>
+    <div class="field wide betting-options-field"><%= form.label :no_limit, "Betting options" %><div class="betting-options-row"><div class="boolean-field"><%= form.check_box :no_limit %><%= form.label :no_limit, "No Limit" %></div><div class="boolean-field"><%= form.check_box :pot_limit %><%= form.label :pot_limit, "Pot Limit" %></div><div class="boolean-field"><%= form.check_box :fixed_limit %><%= form.label :fixed_limit, "Limit" %></div></div></div>
+    <div class="field wide"><div class="boolean-field"><%= form.check_box :bomb_pot %><%= form.label :bomb_pot, "Bomb Pot" %></div></div>
+    <div class="field"><%= form.label :pot_1_hand_rule, "Pot 1 Hand Rule" %><%= form.select :pot_1_hand_rule, Variant::HAND_RULES.map { |value| [Variant::HAND_RULE_LABELS.fetch(value), value] }, { include_blank: "Select a hand rule" } %></div>
+    <div class="field"><%= form.label :pot_1_qualifier, "Pot 1 Qualifier" %><%= form.select :pot_1_qualifier, Variant::POT_QUALIFIERS.sort_by { |_, label| label }.map { |value, label| [label, value] }, { include_blank: "No qualifier" } %></div>
+    <div class="field"><%= form.label :pot_2_hand_rule, "Pot 2 Hand Rule" %><%= form.select :pot_2_hand_rule, Variant::HAND_RULES.map { |value| [Variant::HAND_RULE_LABELS.fetch(value), value] }, { include_blank: "Select a hand rule" } %></div>
+    <div class="field"><%= form.label :pot_2_qualifier, "Pot 2 Qualifier" %><%= form.select :pot_2_qualifier, Variant::POT_QUALIFIERS.sort_by { |_, label| label }.map { |value, label| [label, value] }, { include_blank: "No qualifier" } %></div>
+    <div class="field wide"><%= form.label :special_mechanics, "Special Mechanics" %><%= form.text_area :special_mechanics, rows: 3 %></div>
+  <% Variant::GROUPS.each_value do |fields| %>
       <% fields.each do |field| %>
         <div class="field <%= 'wide' if Variant::LONG_FIELDS.include?(field) || field == :name || field.in?(%i[pot_1_hand_rule pot_2_hand_rule]) %>">
           <%= form.label field, "#{Variant::FIELDS[field]}#{' *' if %i[name family].include?(field)}" %>
-          <% if field == :split_pot %>
-            <%= form.select field, ["Yes", "No"], include_blank: "Not specified" %>
-          <% elsif field == :betting_format %>
-            <%= form.select field, Variant::BETTING_FORMATS.map { |value| [Variant::BETTING_FORMAT_LABELS.fetch(value), value] }, { include_blank: "Select an option" } %>
+          <% if field == :forced_bet %>
+            <%= form.select field, Variant::FORCED_BETS, include_blank: "Not specified" %>
+          <% elsif field == :bring_in %>
+            <%= form.select field, Variant::BRING_INS.map { |value, label| [label, value] }, include_blank: "Not specified" %>
+          <% elsif field.in?(%i[no_limit pot_limit fixed_limit]) %>
+            <div class="boolean-field"><%= form.check_box field %><%= form.label field, Variant::BETTING_OPTION_LABELS.fetch(field) %></div>
           <% elsif field == :family %>
             <% options = field == :family ? Variant::FAMILIES : Variant::GAME_TYPES %>
             <%= form.select field, options | [variant.public_send(field)].compact, { include_blank: "Select an option" }, required: true %>
           <% elsif Variant::LONG_FIELDS.include?(field) %>
             <%= form.text_area field, rows: 3 %>
-          <% elsif %i[max_players starting_cards_down starting_cards_up].include?(field) %>
+          <% elsif field == :max_players %>
             <%= form.number_field field, min: field == :max_players ? 1 : 0, step: 1 %>
           <% else %>
             <%= form.text_field field, required: field == :name %>
           <% end %>
         </div>
       <% end %>
-    </div></section>
   <% end %>
+  </div>
+  </section>
 <% end %>

@@ -3,19 +3,14 @@ Variant.transaction do
   workbook.fetch("variants").each_with_index do |row, index|
     next if row.values.any? { |value| value.to_s.match?(/Bug is wild/i) }
     source_id = workbook.fetch("model").fetch(index).fetch("variant_id")
-    existing_variant = Variant.find_by(source_id: source_id)
+    existing_variant = Variant.find_by(name: row["Variant"])
     next if existing_variant&.sequence_steps&.exists?
 
     attributes = Variant::FIELDS.to_h { |field, column| [ field, row.fetch(column, nil).presence ] }
-    attributes[:starting_cards_down] = row["Starting Cards"].presence
-    attributes[:starting_cards_up] = row["Initial Up Cards"].presence
-    attributes[:betting_format] = if row["Betting Limit / Category"].to_s.match?(/Fixed-Limit/i)
-      "fixed_limt"
-    elsif row["Betting Limit / Category"].to_s.match?(/Pot-Limit/i)
-      "pot_limit"
-    else
-      "no_limit"
-    end
+    betting_category = row["Betting Limit / Category"].to_s
+    attributes[:fixed_limit] = betting_category.match?(/Fixed-Limit/i)
+    attributes[:pot_limit] = betting_category.match?(/Pot-Limit/i)
+    attributes[:no_limit] = !attributes[:fixed_limit] && !attributes[:pot_limit]
     if attributes[:max_players].blank?
       match = attributes[:special_mechanics].to_s.match(/(\d+)\s+Players?\s+Max/i)
       attributes[:max_players] = match[1] if match
@@ -36,7 +31,7 @@ Variant.transaction do
       detail["sequence"] = [{ "event_type" => "deal", "hole_card_count" => "6" }, { "event_type" => "special", "event_name" => "Separate" }, { "event_type" => "special", "event_name" => "Cap" }, { "event_type" => "betting" }, { "event_type" => "deal", "community_card_count" => "3" }, { "event_type" => "betting" }, { "event_type" => "draw", "event_name" => "Badugi draw" }, { "event_type" => "deal", "community_card_count" => "2" }, { "event_type" => "betting" }, { "event_type" => "deal", "event_name" => "River", "community_card_count" => "1" }, { "event_type" => "betting" }]
     end
     detail["source"] = workbook.fetch("sources").fetch(index)
-    variant = existing_variant || Variant.create!(attributes.merge(source_id: source_id, source_detail: detail))
+    variant = existing_variant || Variant.create!(attributes)
     if row["Variant"] == "Archie"
       variant.update_columns(special_mechanics: "High qualifier: 99 or better (CAZ) or 66 or better (LV variant).")
     elsif row["Variant"] == "Gardena Jackpots"
@@ -84,6 +79,7 @@ Variant.transaction do
         variant.sequence_steps.create!(position: position + 1, action_type: SequenceStep::TYPES.include?(type) ? type : "special", card_scope: community_cards.positive? ? "community" : hole_cards.positive? || event["up_card_count"].to_i.positive? ? "individual" : nil, cards_down: hole_cards.positive? ? hole_cards : nil, cards_up: community_cards.positive? ? community_cards : event["up_card_count"].to_i.positive? ? event["up_card_count"].to_i : nil, min_cards: min_cards, max_cards: max_cards)
       end
     end
+    pot_rules = {}
     workbook.fetch("hand_rules").select { |entry| entry["variant_id"] == source_id }.each do |entry|
       construction = entry["hand_construction_or_ranking"].to_s
       hole = construction.match(/(?:using|from)\s+(?:exactly\s+)?(\d+)\s+(?:Individual|down)/i)&.[](1)
@@ -95,7 +91,7 @@ Variant.transaction do
       if row["Variant"].match?(/Dra.*maha/i) && construction.match?(/Omaha hand/i)
         hole = "2"
         community = "3"
-        rule = "standard_high"
+        rule = "high_standard"
       end
       rule = if construction.match?(/pip\s*count/i) && construction.match?(/high/i)
         "pip_count_high"
@@ -112,21 +108,16 @@ Variant.transaction do
       elsif construction.match?(/Lowest|Razz|A[–-]5|Ace is low|lowball/i)
         "ace_to_five_low"
       else
-        "standard_high"
+        "high_standard"
       end
-      direction = row["Variant"].match?(/Dra.*maha/i) ? nil : entry["pot_name"].to_s.match?(/low/i) ? "low" : entry["pot_name"].to_s.match?(/high/i) ? "high" : nil
-      ace_behavior = if construction.match?(/Ace is (?:always )?high/i)
-        "high"
-      elsif construction.match?(/Ace is (?:always )?low/i)
-        "low"
-      elsif construction.match?(/Ace/i)
-        "either"
-      else
-        { "ace_to_five_low" => "low", "deuce_to_seven_low" => "high", "badugi" => "low", "badeucey" => "high" }.fetch(rule, "either")
-      end
-      variant.hand_rules.create!(pot_number: entry["pot_number"].to_i, direction: direction, ace_behavior: ace_behavior, hand_size: 5, hole_cards_required: hole, community_cards_required: community, rule: rule, qualifier: entry["qualifier"].presence, notes: construction, source_pages: entry["source_pages"])
+      pot_rules[entry["pot_number"].to_i] = { rule: rule, qualifier: entry["qualifier"].presence }
     end
-    variant.update_columns(pot_1_hand_rule: variant.hand_rules.find_by(pot_number: 1)&.notes, pot_2_hand_rule: variant.hand_rules.find_by(pot_number: 2)&.notes)
+    variant.update_columns(
+      pot_1_hand_rule: pot_rules.dig(1, :rule),
+      pot_1_qualifier: pot_rules.dig(1, :qualifier),
+      pot_2_hand_rule: pot_rules.dig(2, :rule),
+      pot_2_qualifier: pot_rules.dig(2, :qualifier)
+    )
   end
 end
 puts "#{Variant.count} poker variants available. Existing records were left intact."

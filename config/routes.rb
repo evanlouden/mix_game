@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root "variants#index"
+  get "variants/random", to: "variants#random", as: :random_variant
   resources :variants do
     resources :sequence_steps, only: %i[new create edit update destroy]
   end

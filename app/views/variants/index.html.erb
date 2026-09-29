@@ -1,6 +1,6 @@
 <section class="hero">
   <div><p class="eyebrow"><span class="status-dot"></span> THE POKER VARIANT LIBRARY</p><h1>Find your next <em>game.</em></h1><p class="hero-copy">From the classics to the wonderfully unfamiliar.<br>Explore the rules, learn the mechanics, and keep your mix fresh.</p>
-    <div class="hero-actions"><%= link_to "+ Add variant", new_variant_path, class: "button primary" %><%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "button secondary" %></div>
+    <div class="hero-actions"><%= link_to "Random variant", random_variant_path, class: "button primary" %><%= link_to "+ Add variant", new_variant_path, class: "button secondary" %><%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "button secondary" %></div>
   </div>
   <div class="card-art" aria-hidden="true"><div class="playing-card card-back"></div><div class="playing-card card-queen"><span>Q<small>♥</small></span><b>♥</b><span class="corner-bottom">Q<small>♥</small></span></div><div class="playing-card card-ace"><span>A<small>♠</small></span><b>♠</b><span class="corner-bottom">A<small>♠</small></span></div><div class="art-caption">THERE’S MORE THAN ONE WAY TO PLAY.</div></div>
 </section>
@@ -15,19 +15,17 @@
   <%= form_with url: variants_path, method: :get, class: "filters" do |form| %>
     <div class="search-field"><span aria-hidden="true">⌕</span><%= form.search_field :q, value: params[:q], placeholder: "Search names, rules, or mechanics…", aria: { label: "Search variants" } %></div>
     <%= form.select :family, Variant::FAMILIES | @family_counts.keys.compact.sort, { include_blank: "All families", selected: params[:family] }, aria: { label: "Game family" } %>
-    <%= form.select :betting_structure, ["Fixed-Limit", "Pot-Limit", "Big-Bet (PDF category)"], { include_blank: "All betting structures", selected: params[:betting_structure] }, aria: { label: "Betting structure" } %>
     <%= form.select :split_pot, [["Split pot", "Yes"], ["Single pot", "No"]], { include_blank: "All pot types", selected: params[:split_pot] }, aria: { label: "Pot type" } %>
-    <%= form.select :confirmed, [["Confirmed", "yes"], ["Needs review", "no"]], { include_blank: "All review status", selected: params[:confirmed] }, aria: { label: "Review status" } %>
     <%= form.submit "Filter", class: "button primary" %>
   <% end %>
-  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :betting_structure, :split_pot, :confirmed).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :betting_structure, :split_pot, :confirmed).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
+  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
   <% if @variants.empty? %>
     <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %> <%= link_to "Add variant", new_variant_path, class: "button primary" %></div>
   <% else %>
     <div class="variant-grid">
       <% @variants.each do |variant| %>
         <%= link_to variant, class: "variant-card" do %>
-          <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="review-badge <%= variant.confirmed? ? "confirmed" : "needs-review" %>"><%= variant.confirmed? ? "CONFIRMED" : "REVIEW" %></span><span class="format-badge"><%= { "fixed_limt" => "LIMIT", "pot_limit" => "POT LIMIT", "no_limit" => "NO LIMIT" }.fetch(variant.betting_format, variant.betting_structure.to_s.match?(/Fixed-Limit/i) ? "LIMIT" : "NO LIMIT") %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
+          <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="format-badge"><%= variant.betting_format_display.upcase %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
         <% end %>
       <% end %>
     </div>
