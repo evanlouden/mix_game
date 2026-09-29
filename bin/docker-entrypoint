@@ -6,6 +6,10 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
-# Add any container initialization steps here
+# SQLite uses a persistent volume, so prepare the database on the app machine
+# rather than in Fly's temporary release machine.
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
 
 exec "${@}"
