@@ -1,6 +1,6 @@
 <section class="hero">
   <div><p class="eyebrow"><span class="status-dot"></span> THE POKER VARIANT LIBRARY</p><h1>Find your next <em>game.</em></h1><p class="hero-copy">From the classics to the wonderfully unfamiliar.<br>Explore the rules, learn the mechanics, and keep your mix fresh.</p>
-    <div class="hero-actions"><%= link_to "Random variant", random_variant_path, class: "button primary" %><%= link_to "+ Add variant", new_variant_path, class: "button secondary" %><%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "button secondary" %></div>
+    <div class="hero-actions"><%= link_to "Random variant", random_variant_path, class: "button primary" %><%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "button secondary" %></div>
   </div>
   <div class="card-art" aria-hidden="true"><div class="playing-card card-back"></div><div class="playing-card card-queen"><span>Q<small>♥</small></span><b>♥</b><span class="corner-bottom">Q<small>♥</small></span></div><div class="playing-card card-ace"><span>A<small>♠</small></span><b>♠</b><span class="corner-bottom">A<small>♠</small></span></div><div class="art-caption">THERE’S MORE THAN ONE WAY TO PLAY.</div></div>
 </section>

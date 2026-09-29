@@ -36,9 +36,6 @@ class VariantsController < ApplicationController
   end
 
   def show
-    @previous_variant = Variant.where("id < ?", @variant.id).order(id: :desc).first
-    @next_variant = Variant.where("id > ?", @variant.id).order(:id).first
-
     @sequence = @variant.sequence_steps.map do |step|
       community_count = step.card_scope == "community" ? step.cards_up.to_i : 0
       board_count = step.number_of_boards.to_i

@@ -52,12 +52,4 @@ module VariantsHelper
     end, " ").html_safe
   end
 
-  def double_board_sequence_markup(count)
-    per_board = (count.to_i / 2.0).ceil
-    safe_join(2.times.map do
-      content_tag(:span, class: "double-board-row") do
-        safe_join(per_board.times.map { content_tag(:span, "C", class: "double-board-card") })
-      end
-    end)
-  end
 end
