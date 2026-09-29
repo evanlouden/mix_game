@@ -111,6 +111,8 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
+    dockerfile-rails (1.7.10)
+      rails (>= 3.0.0)
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
@@ -214,6 +216,12 @@ GEM
     parser (3.3.7.1)
       ast (~> 2.4.1)
       racc
+    pg (1.6.3)
+    pg (1.6.3-aarch64-linux)
+    pg (1.6.3-aarch64-linux-musl)
+    pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
+    pg (1.6.3-x86_64-linux-musl)
     pp (0.6.4)
       prettyprint
     prettyprint (0.2.0)
@@ -427,10 +435,12 @@ DEPENDENCIES
   capybara (~> 3.40)
   csv (~> 3.3)
   devise (~> 5.0)
+  dockerfile-rails (>= 1.7)
   factory_bot_rails (~> 6.5)
   hotwire-livereload (~> 2.1)
   jsbundling-rails
   lookbook (~> 2.3)
+  pg (~> 1.6)
   propshaft (~> 1.3)
   pry-rails
   puma (~> 8.0.2)

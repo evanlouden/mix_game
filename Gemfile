@@ -41,3 +41,7 @@ group :test do
   gem "rspec-rails", "~> 8.0"
   gem "shoulda-matchers", "~> 8.0"
 end
+
+gem "dockerfile-rails", ">= 1.7", :group => :development
+
+gem "pg", "~> 1.6"
