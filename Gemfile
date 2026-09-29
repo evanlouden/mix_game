@@ -10,7 +10,7 @@ gem "devise", "~> 5.0"
 # gem "image_processing", "~> 1.2"
 gem "jsbundling-rails"
 # gem "kamal", require: false
-gem "pg", "~> 1.6.3"
+gem "sqlite3", "~> 2.1"
 gem "propshaft", "~> 1.3"
 gem "puma", "~> 8.0.2"
 gem "rails", "~> 8.1.2"

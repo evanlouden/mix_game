@@ -38,7 +38,7 @@ class Variant < ApplicationRecord
     scope = all
     if filters[:q].present?
       term = "%#{sanitize_sql_like(filters[:q].strip)}%"
-      scope = scope.where("name ILIKE :q OR special_mechanics ILIKE :q", q: term)
+      scope = scope.where("LOWER(name) LIKE LOWER(:q) OR LOWER(special_mechanics) LIKE LOWER(:q)", q: term)
     end
     if filters[:family].present?
       scope = scope.where(family: filters[:family])
