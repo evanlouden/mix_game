@@ -135,6 +135,7 @@
 .sequence-step:has(.double-board-row){padding:8px 6px!important}.sequence-step:has(.double-board-row) .sequence-event{padding:0!important}.sequence-step .double-board-row{overflow:visible!important}
 .sequence-step:not(.sequence-step--empty){padding:10px 6px!important}
 @media(min-width:651px){.sequence-track:has(.double-board-row:nth-child(2)),.sequence-track:has(.double-board-row:nth-child(3)){grid-auto-rows:minmax(82px,max-content)!important}.sequence-step:has(.double-board-row:nth-child(3)){min-height:0!important}.sequence-step:has(.double-board-row:nth-child(3)) .sequence-event{min-height:0!important}}
+@media(min-width:651px){.sequence-track{width:calc(var(--sequence-columns) * 16.6666667%)!important;grid-template-columns:repeat(var(--sequence-columns),minmax(0,1fr))!important}}
 .filters .primary{background:var(--green);color:#fff!important;border-color:var(--green)}.filters .primary:hover{background:#193f31}
 .random-filter-button{background:#6b7f9b;color:#fff!important;border-color:#6b7f9b}.random-filter-button:hover{background:#566a86}
 .filter-actions{display:flex;align-items:center;gap:10px}.filter-actions .button{flex:0 0 auto}
