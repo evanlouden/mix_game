@@ -2,7 +2,7 @@
 <div class="detail-toolbar"><%= link_to "← Back to library", variants_path, class: "back-link" %></div>
 
 <article class="pdf-card" aria-label="<%= @variant.name %>">
-  <div class="pdf-card-top"><span></span><span class="player-limit-number"><%= @variant.max_players.presence || "—" %></span></div>
+  <div class="pdf-card-top"><span></span><span class="player-limit"><span class="player-limit-number"><%= @variant.max_players.presence || "—" %></span><span class="player-limit-label">players</span></span></div>
   <div class="pdf-card-title"><span class="pdf-suit"><%= { "Draw" => "♣", "Hold'em" => "♠", "Omaha" => "♦", "Stud" => "♥" }.fetch(@variant.family, "♠") %></span><div><h2><%= @variant.name %></h2></div></div>
   <div class="pdf-card-rule"></div>
   <div class="pdf-card-badges"><span><%= @variant.betting_format_display.upcase %></span><% if @variant.pot_2_hand_rule.present? %><span>Split Pot</span><% end %><span><%= @variant.forced_bet.presence || "No forced bet specified" %></span><% if @variant.bring_in.present? && @variant.bring_in != "none" %><span>Bring-In<%= " (High)" if @variant.bring_in == "high" %></span><% end %></div>
