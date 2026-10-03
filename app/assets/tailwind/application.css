@@ -1,1 +1,11 @@
 @import "tailwindcss";
+@source "../../views";
+@source "../../components";
+
+@theme {
+  --color-ink: #173b32;
+  --color-muted: #758078;
+  --color-green: #245642;
+  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+}

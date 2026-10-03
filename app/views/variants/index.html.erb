@@ -1,8 +1,14 @@
-<section class="hero">
-  <div><p class="eyebrow"><span class="status-dot"></span> THE POKER VARIANT LIBRARY</p><h1>Find your next <em>game.</em></h1><p class="hero-copy">From the classics to the wonderfully unfamiliar.<br>Explore the rules, learn the mechanics, and keep your mix fresh.</p>
-    <div class="hero-actions"><%= link_to "Random variant", random_variant_path, class: "button primary" %><%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "button secondary" %></div>
+<section class="grid min-h-[365px] items-center gap-8 py-10 sm:grid-cols-[1.3fr_1fr]">
+  <div>
+    <p class="mb-4 flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] text-ink"><span class="inline-block h-1.5 w-1.5 rounded-full bg-[#779b63]"></span> THE POKER VARIANT LIBRARY</p>
+    <h1 class="mb-4 font-serif text-4xl leading-tight font-medium tracking-tight text-ink sm:text-[51px]">Find your next <em class="text-[#608364] italic">game.</em></h1>
+    <p class="mb-6 text-sm leading-loose text-muted">From the classics to the wonderfully unfamiliar.<br>Explore the rules, learn the mechanics, and keep your mix fresh.</p>
+    <div class="flex gap-2">
+      <%= link_to "Random variant", random_variant_path, class: "inline-flex items-center justify-center gap-2 rounded-md bg-green px-5 py-3 text-xs font-semibold leading-6 !text-white transition hover:-translate-y-px hover:bg-[#193f31]" %>
+      <%= link_to "↓ Export CSV", variants_path(request.query_parameters.except("page").merge(format: :csv)), class: "inline-flex items-center justify-center gap-2 rounded-md border border-[#cfd8ce] bg-transparent px-5 py-3 text-xs font-semibold leading-6 !text-ink transition hover:-translate-y-px hover:bg-[#eaf0e6]" %>
+    </div>
   </div>
-  <div class="card-art" aria-hidden="true"><div class="playing-card card-back"></div><div class="playing-card card-queen"><span>Q<small>♥</small></span><b>♥</b><span class="corner-bottom">Q<small>♥</small></span></div><div class="playing-card card-ace"><span>A<small>♠</small></span><b>♠</b><span class="corner-bottom">A<small>♠</small></span></div><div class="art-caption">THERE’S MORE THAN ONE WAY TO PLAY.</div></div>
+  <%= render HeroCardsComponent.new %>
 </section>
 <section class="stats" aria-label="Library statistics">
   <div><span class="stat-icon">♠</span><strong><%= @total %></strong><span>poker variants</span></div>
@@ -20,7 +26,7 @@
   <% end %>
   <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
   <% if @variants.empty? %>
-    <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %> <%= link_to "Add variant", new_variant_path, class: "button primary" %></div>
+    <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %><%= link_to "Add variant", new_variant_path, class: "button primary" if current_user&.admin? %></div>
   <% else %>
     <div class="variant-grid">
       <% @variants.each do |variant| %>

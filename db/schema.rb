@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_000000) do
   create_table "sequence_steps", force: :cascade do |t|
     t.string "action_type", null: false
     t.string "card_scope"
@@ -29,6 +29,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_000000) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -36,6 +37,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_000000) do
     t.datetime "reset_password_sent_at", precision: nil
     t.string "reset_password_token"
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["admin"], name: "index_users_on_admin"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

@@ -1,5 +1,6 @@
 <div class="sequence-card-preview">
-  <% { "Down" => [:down, 3], "Community" => [:community, 1], "Discard" => [:discard, 1], "Draw" => [:draw, "0-5"] }.each do |title, (state, count)| %>
+  <% { "Down" => [:down, 3], "Community" => [:community, 1], "Individual up" => [:up, 1], "Discard" => [:discard, 1], "Draw" => [:draw, "0-5"] }.each do |title, (state, count)| %>
     <section><h3><%= title %></h3><div class="sequence-card-preview-stage"><%= render SequenceCardComponent.new(state: state, count: count) %></div></section>
   <% end %>
+  <section><h3>Betting round</h3><div class="sequence-card-preview-stage"><%= render PokerChipComponent.new %></div></section>
 </div>

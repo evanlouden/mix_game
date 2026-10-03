@@ -2,8 +2,12 @@
   <% if labels.empty? %>
     <div class="sequence-empty">Sequence details haven’t been added yet.</div>
   <% else %>
-    <% labels.each do |label| %>
-      <div class="sequence-step"><span class="sequence-event"><%= label_markup(label) %></span></div>
+    <% sequence.each_with_index do |event, index| %>
+      <div class="sequence-step"><span class="sequence-event"><%= label_markup(labels[index]) %></span><span class="sequence-action-type"><%= action_type(event) %></span></div>
+    <% end %>
+    <% empty_cells = (6 - (labels.length % 6)) % 6 %>
+    <% if empty_cells.positive? %>
+      <div class="sequence-step sequence-step--empty" style="grid-column:span <%= empty_cells %>" aria-hidden="true"></div>
     <% end %>
   <% end %>
 </div>

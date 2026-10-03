@@ -49,4 +49,10 @@ bundle exec rspec
 bundle exec rubocop app/models/variant.rb app/controllers/variants_controller.rb db/migrate/20260910000000_create_variants.rb db/seeds.rb spec/requests/variants_spec.rb
 ```
 
-The library is a shared local workspace: visitors can edit all variants. The starter’s Devise routes remain available, but the library does not require sign-in or apply ownership rules.
+The library is public to browse, while detailed sequence steps, variant attributes, and editing are restricted to signed-in users. Devise sign-in is intentionally not linked in the public interface; use `/users/sign_in` directly. Public registration is disabled. To create the first admin locally or in production, open a Rails console and run:
+
+```ruby
+User.create!(email: "you@example.com", password: "use-a-strong-password", admin: true)
+```
+
+Only admin users can create, edit, or delete variants and sequence steps. Authorization is enforced in the controllers as well as reflected in the interface.

@@ -1,4 +1,5 @@
 class SequenceStepsController < ApplicationController
+  before_action :require_admin!
   before_action :set_variant
   before_action :set_sequence_step, only: %i[edit update destroy]
 

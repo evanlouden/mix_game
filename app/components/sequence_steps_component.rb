@@ -48,6 +48,10 @@ class SequenceStepsComponent < ApplicationComponent
     helpers.sequence_label_markup(label)
   end
 
+  def action_type(event)
+    event["action_type"].presence&.humanize || event["event_type"].to_s.humanize
+  end
+
   def card_range(min_cards, max_cards)
     min_cards.to_i == max_cards.to_i ? max_cards.to_i : "#{min_cards}-#{max_cards}"
   end

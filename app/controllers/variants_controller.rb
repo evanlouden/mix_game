@@ -2,6 +2,7 @@ require "csv"
 
 class VariantsController < ApplicationController
   before_action :set_variant, only: %i[show edit update destroy]
+  before_action :require_admin!, only: %i[new create edit update destroy]
 
   def index
     @total = Variant.count
@@ -56,7 +57,7 @@ class VariantsController < ApplicationController
         step_label
       end
       event_type = board_count > 1 && community_count.positive? ? "special" : (step.card_scope == "community" ? "deal" : step.action_type)
-      { "event_type" => event_type, "event_name" => event_name, "hole_card_count" => step.card_scope == "individual" ? step.cards_down.to_s : "0", "up_card_count" => step.card_scope == "individual" ? step.cards_up.to_s : "0", "community_card_count" => community_count.to_s, "min_cards" => step.min_cards, "max_cards" => step.max_cards }
+      { "event_type" => event_type, "action_type" => step.action_type, "event_name" => event_name, "hole_card_count" => step.card_scope == "individual" ? step.cards_down.to_s : "0", "up_card_count" => step.card_scope == "individual" ? step.cards_up.to_s : "0", "community_card_count" => community_count.to_s, "min_cards" => step.min_cards, "max_cards" => step.max_cards }
     end
   end
   def new

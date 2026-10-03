@@ -2,6 +2,11 @@ require "rails_helper"
 
 RSpec.describe "Variant library", type: :request do
   let!(:variant) { Variant.create!(name: "Archie", family: "Draw", pot_1_hand_rule: "high_standard", pot_2_hand_rule: "ace_to_five_low", special_mechanics: "High and low", max_players: "6") }
+  let!(:admin) { create(:user, admin: true) }
+
+  def sign_in_admin
+    post user_session_path, params: { user: { email: admin.email, password: "password" } }
+  end
 
   it "lists and filters variants" do
     get root_path
@@ -16,7 +21,12 @@ RSpec.describe "Variant library", type: :request do
 
   it "shows the complete rules and both forms" do
     get variant_path(variant)
-    expect(response.body).to include("High and low", "Edit variant")
+    expect(response.body).to include("High and low")
+    expect(response.body).not_to include("Edit variant")
+    expect(response.body).not_to include("VARIANT ATTRIBUTES")
+    sign_in_admin
+    get variant_path(variant)
+    expect(response.body).to include("High and low", "Edit variant", "VARIANT ATTRIBUTES")
     get new_variant_path
     expect(response).to have_http_status(:ok)
     get edit_variant_path(variant)
@@ -24,6 +34,8 @@ RSpec.describe "Variant library", type: :request do
   end
 
   it "creates, updates, and deletes a persisted variant" do
+    sign_in_admin
+    sign_in_admin
     expect { post variants_path, params: { variant: { name: "House game", family: "Stud", fixed_limit: "1", special_mechanics: "House rules" } } }.to change(Variant, :count).by(1)
     created = Variant.order(:id).last
     expect(response).to redirect_to(variant_path(created))
@@ -34,7 +46,17 @@ RSpec.describe "Variant library", type: :request do
     expect(response).to redirect_to(variants_path)
   end
 
+  it "keeps editing private" do
+    get new_variant_path
+    expect(response).to redirect_to(new_user_session_path)
+
+    post variants_path, params: { variant: { name: "Blocked", family: "Stud" } }
+    expect(response).to redirect_to(new_user_session_path)
+    expect(Variant.where(name: "Blocked")).to be_empty
+  end
+
   it "rejects missing required fields and invalid counts without losing input" do
+    sign_in_admin
     expect { post variants_path, params: { variant: { name: "Invalid game", family: "", max_players: "-1" } } }.not_to change(Variant, :count)
     expect(response).to have_http_status(:unprocessable_entity)
     expect(response.body).to include("Invalid game", "Family", "greater than 0")
