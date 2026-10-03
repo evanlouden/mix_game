@@ -11,12 +11,15 @@
 .sequence-step .sequence-event{letter-spacing:.9px;font-weight:600}
 .sequence-playing-card{display:inline-block;width:24px;height:31px;margin:0 2px;padding:0;background:#fff;border:1px solid #c8c9c0;border-radius:3px;box-shadow:1px 2px 0 #d9d5c9;color:#a64e42;font-family:Georgia,serif;font-size:14px;font-weight:600;line-height:29px !important;text-align:center;letter-spacing:0;vertical-align:middle;transform:translateY(-1px)}.sequence-track{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;overflow-x:auto}.sequence-step{display:block;flex:0 0 108px}.sequence-step .sequence-event{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;width:100%}
 .sequence-playing-card.face-down{background:#315746;border:2px solid #fff;box-shadow:1px 2px 0 #c7c3b7;color:#f3f1e7;font-family:'DM Sans',sans-serif;font-size:10px;position:relative}.sequence-playing-card.face-down+.sequence-playing-card.face-down{margin-left:-18px}
-.player-limit-number{font-family:var(--serif);font-size:24px;letter-spacing:0;color:#557153}
+.player-limit-number{font-family:var(--serif);font-size:24px;letter-spacing:0;color:var(--ink)}
 .player-limit{display:flex;flex-direction:column;align-items:center;line-height:1}
 .player-limit-label{font-family:'DM Sans',sans-serif;font-size:7px;font-weight:400;letter-spacing:.5px;color:#8a928a;text-transform:lowercase;margin-top:3px}
 .pdf-card:before{display:none}.sequence-track{width:max-content;min-width:0;max-width:100%;border:1px solid #d5cfbf;background:#faf8f1}.sequence-step{flex:0 0 108px!important;width:108px}.sequence-step:has(.bet-marker),.sequence-step:last-child{flex:0 0 58px!important;width:58px;min-width:58px}.bet-marker{font-size:22px;line-height:1;filter:saturate(.75);display:inline-block}
 .pdf-card-title{position:absolute;top:34px;left:31px;padding:0}.pdf-card-rule{margin-top:78px}
 .pdf-card-title{position:absolute;top:34px;left:31px;padding:0}.pdf-card-rule{margin-top:78px}@media(max-width:650px){.pdf-card-title{left:18px;top:28px}.pdf-card-rule{margin-top:70px}}
+.pdf-card-title h2{min-width:0;overflow-wrap:anywhere}
+@media(max-width:650px){.pdf-card-title{top:18px;right:72px}.pdf-card-badges{top:102px}}
+@media(min-width:651px){.pdf-card-title{top:24px}}
 .sequence-step{flex-basis:58px!important;width:58px}.sequence-step:has(.sequence-playing-card.face-down){flex-basis:108px!important;width:108px}.sequence-step:has(.sequence-playing-card+.sequence-playing-card){flex-basis:84px!important;width:84px}.sequence-step:has(.sequence-playing-card+.sequence-playing-card+.sequence-playing-card){flex-basis:108px!important;width:108px}
 .bet-marker{font-size:34px;line-height:1}.sequence-step:has(.bet-marker){flex-basis:70px!important;width:70px;min-width:70px}
 .bet-marker{font-size:36px!important;line-height:1}.sequence-step:has(.bet-marker){flex-basis:72px!important;width:72px;min-width:72px}
