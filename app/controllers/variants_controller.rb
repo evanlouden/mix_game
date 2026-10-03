@@ -8,6 +8,7 @@ class VariantsController < ApplicationController
     @total = Variant.count
     @family_counts = Variant.group(:family).count
     @split_count = Variant.where.not(pot_2_hand_rule: [nil, ""]).count
+    @player_options = Variant.where.not(max_players: [nil, ""]).distinct.pluck(:max_players).sort_by(&:to_i)
     @variants = Variant.filtered(params)
     @count = @variants.count
     respond_to do |format|

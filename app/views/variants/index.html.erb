@@ -22,9 +22,10 @@
     <%= form.select :split_pot, [["Split pot", "Yes"], ["Single pot", "No"]], { include_blank: "All pot types", selected: params[:split_pot] }, aria: { label: "Pot type" } %>
     <%= form.select :betting_format, [["Pot limit", "pot_limit"], ["No limit", "no_limit"], ["Limit", "fixed_limit"]], { include_blank: "All betting formats", selected: params[:betting_format] }, aria: { label: "Betting format" } %>
     <%= form.select :bomb_pot, [["Bomb pots", "Yes"], ["Non-bomb pots", "No"]], { include_blank: "All bomb pot types", selected: params[:bomb_pot] }, aria: { label: "Bomb pot type" } %>
+    <%= form.select :players, @player_options.map { |players| ["#{players} players", players] }, { include_blank: "All player counts", selected: params[:players] }, aria: { label: "Number of players" } %>
     <div class="filter-actions"><%= form.submit "Filter", class: "button primary" %><%= link_to "Random", random_variant_path(request.query_parameters.except("page")), class: "button random-filter-button" %></div>
   <% end %>
-  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
+  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot, :players).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot, :players).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
   <% if @variants.empty? %>
     <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %><%= link_to "Add variant", new_variant_path, class: "button primary" if current_user&.admin? %></div>
   <% else %>

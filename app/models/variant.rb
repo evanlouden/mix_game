@@ -57,6 +57,7 @@ class Variant < ApplicationRecord
     if filters[:bomb_pot].present? && %w[Yes No].include?(filters[:bomb_pot])
       scope = scope.where(bomb_pot: filters[:bomb_pot] == "Yes")
     end
+    scope = scope.where(max_players: filters[:players]) if filters[:players].present?
     scope.order(:name, :id)
   end
 
