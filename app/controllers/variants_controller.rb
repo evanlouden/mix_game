@@ -12,9 +12,6 @@ class VariantsController < ApplicationController
     @count = @variants.count
     respond_to do |format|
       format.html do
-        @pages = [ (@count / 24.0).ceil, 1 ].max
-        @page = params[:page].to_i.clamp(1, @pages)
-        @variants = @variants.offset((@page - 1) * 24).limit(24)
       end
       format.csv do
         csv = CSV.generate do |output|
@@ -27,12 +24,12 @@ class VariantsController < ApplicationController
   end
 
   def random
-    variant = Variant.order("RANDOM()").first
+    variant = Variant.filtered(params).reorder(Arel.sql("RANDOM()")).first
 
     if variant
       redirect_to variant
     else
-      redirect_to variants_path, alert: "No variants are available yet."
+      redirect_to variants_path(request.query_parameters.except("action", "controller")), alert: "No variants match those filters."
     end
   end
 

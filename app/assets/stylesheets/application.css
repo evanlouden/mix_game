@@ -104,6 +104,19 @@
 .sequence-step:not(.sequence-step--empty){flex-direction:column!important;gap:3px}
 .sequence-action-type{display:block;font-family:'DM Sans',sans-serif!important;font-size:6px;line-height:1;letter-spacing:.35px;text-transform:uppercase;color:#8a928a;white-space:nowrap;font-weight:500}
 .sequence-step .sequence-action-type{font-family:'DM Sans',sans-serif!important;font-size:6px!important;line-height:1!important}
+.pdf-pot-grid{display:grid;grid-template-columns:1fr;border:1px solid #d5cfbf;background:#faf8f1;margin-bottom:18px}.pdf-pot-cell{padding:15px 18px 16px;border-right:1px solid #d5cfbf;border-bottom:1px solid #d5cfbf}.pdf-pot-cell:last-child{border-right:0;border-bottom:0}.pdf-pot-cell .pdf-label{margin-bottom:8px;font-size:9px;color:var(--ink);letter-spacing:1.8px}.pdf-pot-cell .final-hand-rule{margin:0}.pdf-pot-cell .final-hand-qualifier{margin:4px 0 0}
+@media(max-width:650px){.pdf-pot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pdf-pot-cell{padding:12px 10px;border-bottom:0}}
+.pdf-pot-cell{background:#fff}.pdf-pot-cell .pot-label{font-size:9px!important;color:var(--ink)!important}
+.pdf-pot-cell .pot-label{display:block;padding-bottom:6px;border-bottom:1px solid #d5cfbf;margin-bottom:8px}
+@media(max-width:650px){.pdf-sequence .sequence-track{width:50vw!important;margin-left:auto;margin-right:auto}.pdf-pot-cell{text-align:center}}
+@media(max-width:650px){.pdf-pot-grid:has(.pdf-pot-cell:only-child){grid-template-columns:1fr;width:50vw;margin-left:auto;margin-right:auto}}
+@media(min-width:651px){.pdf-pot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pdf-pot-grid:has(.pdf-pot-cell:only-child){grid-template-columns:1fr}}
+@media(min-width:651px){.pdf-pot-grid .pdf-pot-cell{border-bottom:0}}
+@media(min-width:651px){.pdf-pot-grid:has(.pdf-pot-cell:only-child){width:50%;margin-left:0;margin-right:0}}
+.pdf-card-columns>div:first-child>.pdf-label{font-size:8px!important;margin-left:0!important;padding-left:0!important;color:#7c8776!important}.pdf-card-columns>div:first-child>.pdf-label:after{content:none!important}
+.pdf-card-columns>div:first-child{padding-left:18px}
+@media(min-width:651px){.pdf-card-rule{margin-top:112px}}
+@media(max-width:650px){.pdf-card .pdf-sequence{margin-top:118px}}
 .sequence-step:not(.sequence-step--empty){padding:8px 6px!important;gap:6px}
 .sequence-step .sequence-action-type{font-size:7px!important;line-height:1!important}
 @media(min-width:651px){.sequence-step.sequence-step--empty{border-top:1px solid #ddd7c9!important;border-left:1px solid #ddd7c9!important}}
@@ -112,6 +125,25 @@
 @media(max-width:650px){.sequence-step--empty{display:none!important}}
 @media(max-width:650px){html,body{overflow-x:hidden}.sequence-attributes{max-width:100%;overflow-x:auto}.sequence-attributes table{display:block;width:100%;max-width:100%;overflow-x:auto;white-space:nowrap}}
 @media(max-width:650px){.pdf-card{min-height:680px;overflow:visible;padding-bottom:32px}.pdf-card .pdf-sequence{margin-top:132px;overflow:visible}.pdf-card .sequence-track{overflow:visible}}
+@media(min-width:651px){.pdf-card .pdf-sequence{margin-top:96px}}
+@media(max-width:650px){.pdf-card .pdf-sequence{margin-top:90px}}
+.sequence-track:has(.double-board-row:nth-child(2)){grid-auto-rows:112px!important}.sequence-track:has(.double-board-row:nth-child(3)){grid-auto-rows:128px!important}
+.sequence-track{grid-auto-rows:minmax(82px,max-content)!important}.sequence-step:has(.double-board-row){min-height:0!important}.sequence-step:has(.double-board-row) .sequence-event{min-height:0!important}
+@media(max-width:650px){.sequence-track{grid-auto-rows:minmax(0,max-content)!important}.sequence-step:not(.sequence-step--empty){min-height:0!important;height:auto!important}}
+@media(max-width:650px){.sequence-track:has(.double-board-row){grid-auto-rows:minmax(0,max-content)!important}}
+@media(max-width:650px){.sequence-track:has(.double-board-row:nth-child(2)),.sequence-track:has(.double-board-row:nth-child(3)){grid-auto-rows:minmax(0,max-content)!important}}
+.sequence-step:has(.double-board-row){padding:8px 6px!important}.sequence-step:has(.double-board-row) .sequence-event{padding:0!important}.sequence-step .double-board-row{overflow:visible!important}
+.sequence-step:not(.sequence-step--empty){padding:10px 6px!important}
+@media(min-width:651px){.sequence-track:has(.double-board-row:nth-child(2)),.sequence-track:has(.double-board-row:nth-child(3)){grid-auto-rows:minmax(82px,max-content)!important}.sequence-step:has(.double-board-row:nth-child(3)){min-height:0!important}.sequence-step:has(.double-board-row:nth-child(3)) .sequence-event{min-height:0!important}}
+.filters .primary{background:var(--green);color:#fff!important;border-color:var(--green)}.filters .primary:hover{background:#193f31}
+.random-filter-button{background:#6b7f9b;color:#fff!important;border-color:#6b7f9b}.random-filter-button:hover{background:#566a86}
+.filter-actions{display:flex;align-items:center;gap:10px}.filter-actions .button{flex:0 0 auto}
+@media(max-width:650px){.filter-actions{width:100%}.filter-actions .button{flex:1 1 0}.filters .random-filter-button{width:auto}}
+@media(max-width:650px){.filter-actions{flex-direction:column;align-items:stretch}.filter-actions .button{width:100%;flex:0 0 auto}}
+@media(min-width:651px) and (max-width:1050px){.filters select{min-width:0}.filter-actions{flex:1 1 auto}}
+@media(min-width:1051px){.filters select{flex:1 1 0;width:auto;min-width:130px}}
+@media(min-width:1051px){.filters{display:grid;grid-template-columns:minmax(260px,1.6fr) repeat(3,minmax(145px,1fr)) auto;align-items:center}.filters .search-field{width:auto}.filters select{min-width:0}.filter-actions{white-space:nowrap}}
+@media(min-width:651px){.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;gap:8px}.filters .search-field{grid-column:1 / -1;width:auto;flex-basis:auto}.filters select{width:auto;min-width:0}.filter-actions{display:contents}.filter-actions .button{width:100%}}
 /* All semantic playing cards share one physical size; wrappers control layout and overlap. */
 .sequence-playing-card{box-sizing:border-box!important;width:29px!important;height:38px!important;min-width:29px!important;min-height:38px!important;display:inline-flex!important;align-items:center;justify-content:center;line-height:36px!important;margin:0 2px!important;padding:0!important;box-shadow:none!important;font-family:'DM Sans',sans-serif!important;white-space:nowrap}
 .sequence-playing-card.playing-card--draw{font-size:11px!important;letter-spacing:-.25px}

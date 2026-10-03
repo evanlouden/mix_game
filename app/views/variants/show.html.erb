@@ -7,8 +7,9 @@
   <div class="pdf-card-rule"></div>
   <div class="pdf-card-badges"><span><%= @variant.betting_format_display.upcase %></span><% if @variant.pot_2_hand_rule.present? %><span>Split Pot</span><% end %><span><%= @variant.forced_bet.presence || "No forced bet specified" %></span><% if @variant.bring_in.present? && @variant.bring_in != "none" %><span>Bring-In<%= " (High)" if @variant.bring_in == "high" %></span><% end %></div>
   <div class="pdf-sequence"><%= render SequenceStepsComponent.new(sequence: @sequence || []) %></div>
-  <div class="pdf-card-columns"><div><% if @variant.pot_2_hand_rule.blank? %><p class="pdf-label">POT #1</p><% end %><% pot_rules = [1, 2].filter_map { |pot| label = variant_hand_rule_label(@variant, pot); qualifier = variant_hand_qualifier_label(@variant, pot); label.present? ? [pot, label, qualifier] : nil } %><% if pot_rules.any? %><% if @variant.pot_2_hand_rule.present? %><div class="final-hand-split"><% pot_rules.first(2).each do |pot, label, qualifier| %><div><p class="pdf-label pot-label">POT #<%= pot %></p><p class="final-hand-rule"><%= label %></p><%= tag.p qualifier, class: "final-hand-qualifier" if qualifier.present? %></div><% end %></div><% else %><div class="final-hand-rule-row"><p class="final-hand-rule"><%= pot_rules.first[1] %></p><%= tag.p pot_rules.first[2], class: "final-hand-qualifier" if pot_rules.first[2].present? %></div><% end %><% else %><p>Best poker hand</p><% end %></div><div><p class="pdf-label">SPECIAL MECHANICS</p><p><%= @variant.special_mechanics %></p></div></div>
-  <div class="pdf-card-footer"><span>RULES REFERENCE</span><span>CUSTOM VARIANT</span></div>
+  <% pot_rules = [1, 2].filter_map { |pot| label = variant_hand_rule_label(@variant, pot); qualifier = variant_hand_qualifier_label(@variant, pot); label.present? ? [pot, label, qualifier] : nil } %>
+  <div class="pdf-pot-grid"><% pot_rules.each do |pot, label, qualifier| %><div class="pdf-pot-cell"><p class="pdf-label pot-label">POT #<%= pot %></p><p class="final-hand-rule"><%= label %></p><%= tag.p qualifier, class: "final-hand-qualifier" if qualifier.present? %></div><% end %></div>
+  <div class="pdf-card-columns"><div><p class="pdf-label">SPECIAL MECHANICS</p><p><%= @variant.special_mechanics %></p></div></div>
 </article>
 
 <% if current_user %>

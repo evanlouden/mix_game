@@ -50,6 +50,13 @@ class Variant < ApplicationRecord
         scope.where(pot_2_hand_rule: [nil, ""])
       end
     end
+    if filters[:betting_format].present?
+      betting_field = { "pot_limit" => :pot_limit, "no_limit" => :no_limit, "fixed_limit" => :fixed_limit }[filters[:betting_format]]
+      scope = scope.where(betting_field => true) if betting_field
+    end
+    if filters[:bomb_pot].present? && %w[Yes No].include?(filters[:bomb_pot])
+      scope = scope.where(bomb_pot: filters[:bomb_pot] == "Yes")
+    end
     scope.order(:name, :id)
   end
 
