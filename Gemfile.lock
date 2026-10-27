@@ -80,7 +80,7 @@ GEM
     ast (2.4.2)
     base64 (0.3.0)
     bcrypt (3.1.22)
-    bigdecimal (4.1.2)
+    bigdecimal (4.1.3)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
     brakeman (8.0.6)
@@ -98,7 +98,7 @@ GEM
     coderay (1.1.3)
     concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
-    crass (1.0.7)
+    crass (1.0.8)
     css_parser (3.0.0)
       addressable
       ssrf_filter (~> 1.5)
@@ -397,12 +397,11 @@ GEM
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
-    uri (1.1.1)
+    uri (1.1.2)
     useragent (0.16.11)
-    view_component (4.15.0)
+    view_component (4.19.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
-      concurrent-ruby (~> 1)
     warden (1.2.9)
       rack (>= 2.0.9)
     websocket-driver (0.8.2)
@@ -456,7 +455,7 @@ DEPENDENCIES
   stimulus-rails
   tailwindcss-rails (~> 4.6)
   turbo-rails
-  view_component (~> 4.15)
+  view_component (~> 4.19)
   yaaf (~> 3.1)
 
 RUBY VERSION
