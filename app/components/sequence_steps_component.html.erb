@@ -3,7 +3,7 @@
     <div class="sequence-empty">Sequence details haven’t been added yet.</div>
   <% else %>
     <% sequence.each_with_index do |event, index| %>
-      <div class="sequence-step"><span class="sequence-event"><%= label_markup(labels[index]) %></span><span class="sequence-action-type"><%= action_type(event) %></span></div>
+      <div class="sequence-step"><span class="sequence-event"><%= label_markup(labels[index]) %></span><span class="sequence-action-type"><%= action_type(event, index) %></span></div>
     <% end %>
     <% empty_cells = labels.length > 6 ? (6 - (labels.length % 6)) % 6 : 0 %>
     <% if empty_cells.positive? %>

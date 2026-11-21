@@ -16,25 +16,26 @@
 </section>
 <section class="library">
   <div class="section-heading"><h2>The library <span><%= @total %></span></h2><p>A different deal for every table.</p></div>
-  <%= form_with url: variants_path, method: :get, class: "filters" do |form| %>
+  <%= form_with url: variants_path, method: :get, class: "filters", data: { controller: "auto-filter", action: "input->auto-filter#schedule change->auto-filter#submit", turbo_frame: "variant-results" } do |form| %>
     <div class="search-field"><span aria-hidden="true">⌕</span><%= form.search_field :q, value: params[:q], placeholder: "Search names, rules, or mechanics…", aria: { label: "Search variants" } %></div>
     <%= form.select :family, Variant::FAMILIES | @family_counts.keys.compact.sort, { include_blank: "All families", selected: params[:family] }, aria: { label: "Game family" } %>
     <%= form.select :split_pot, [["Split pot", "Yes"], ["Single pot", "No"]], { include_blank: "All pot types", selected: params[:split_pot] }, aria: { label: "Pot type" } %>
     <%= form.select :betting_format, [["Pot limit", "pot_limit"], ["No limit", "no_limit"], ["Limit", "fixed_limit"]], { include_blank: "All betting formats", selected: params[:betting_format] }, aria: { label: "Betting format" } %>
-    <%= form.select :bomb_pot, [["Bomb pots", "Yes"], ["Non-bomb pots", "No"]], { include_blank: "All bomb pot types", selected: params[:bomb_pot] }, aria: { label: "Bomb pot type" } %>
     <%= form.select :players, @player_options.map { |players| ["#{players} players", players] }, { include_blank: "All player counts", selected: params[:players] }, aria: { label: "Number of players" } %>
-    <div class="filter-actions"><%= form.submit "Filter", class: "button primary" %><%= link_to "Random", random_variant_path(request.query_parameters.except("page")), class: "button random-filter-button" %></div>
+    <div class="filter-actions"><%= form.submit "Filter", class: "button primary" %><%= link_to "Random", random_variant_path(request.query_parameters.except("page")), class: "button random-filter-button" %><%= link_to "💣", random_variant_path(bomb_pot: "Yes"), class: "button bomb-pot-button", aria: { label: "Bomb Pot" }, title: "Bomb Pot" %></div>
   <% end %>
-  <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot, :players).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot, :betting_format, :bomb_pot, :players).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
-  <% if @variants.empty? %>
-    <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %><%= link_to "Add variant", new_variant_path, class: "button primary" if current_user&.admin? %></div>
-  <% else %>
-    <div class="variant-grid">
-      <% @variants.each do |variant| %>
-        <%= link_to variant, class: "variant-card" do %>
-          <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="format-badge"><%= variant.betting_format_display.upcase %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
+  <%= turbo_frame_tag "variant-results" do %>
+    <div class="results-heading"><span><%= @count %> <%= "variant".pluralize(@count) %><%= " matching your filters" if params.values_at(:q, :family, :split_pot, :betting_format, :players).any?(&:present?) %></span><%= link_to "Clear filters", variants_path if params.values_at(:q, :family, :split_pot, :betting_format, :players).any?(&:present?) %><span class="sort-note">NAME A–Z</span></div>
+    <% if @variants.empty? %>
+      <div class="empty-state"><span>♧</span><h2>No variants found</h2><p>Try a broader search or add a game of your own.</p><%= link_to "Reset filters", variants_path, class: "button secondary" %><%= link_to "Add variant", new_variant_path, class: "button primary" if current_user&.admin? %></div>
+    <% else %>
+      <div class="variant-grid">
+        <% @variants.each do |variant| %>
+          <%= link_to variant, class: "variant-card", data: { turbo_frame: "_top" } do %>
+            <div class="library-row"><h3><%= variant.name %></h3><div class="library-meta"><span class="format-badge"><%= variant.betting_format_display.upcase %></span><span class="library-players"><%= variant.max_players.presence || "—" %></span></div></div>
+          <% end %>
         <% end %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
 </section>

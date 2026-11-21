@@ -3,3 +3,6 @@
 // ./bin/rails generate stimulus controllerName
 
 import { application } from "./application"
+import AutoFilterController from "./auto_filter_controller"
+
+application.register("auto-filter", AutoFilterController)

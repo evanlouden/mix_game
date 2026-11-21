@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_03_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_10_020000) do
   create_table "sequence_steps", force: :cascade do |t|
     t.string "action_type", null: false
     t.string "card_scope"
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_000000) do
     t.boolean "fixed_limit", default: false, null: false
     t.text "forced_bet"
     t.text "max_players"
+    t.text "modifiers"
     t.string "name", null: false
     t.boolean "no_limit", default: false, null: false
     t.text "pot_1_hand_rule"

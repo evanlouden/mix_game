@@ -12,11 +12,42 @@ RSpec.describe "Variant library", type: :request do
     get root_path
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("Archie")
+    expect(response.body).to include("💣", "aria-label=\"Bomb Pot\"")
+    expect(response.body).not_to include("All bomb pot types")
     get variants_path, params: { family: "Stud" }
     expect(response.body).to include("No variants found")
     expect(response.body).not_to include("<h3>Archie</h3>")
     get variants_path, params: { q: "archie", split_pot: "Yes" }
     expect(response.body).to include("Archie")
+  end
+
+  it "chooses a random bomb-pot-eligible variant" do
+    bomb_pot_variant = Variant.create!(name: "Bomb Omaha", family: "Omaha", bomb_pot: true)
+    Variant.create!(name: "Split Bomb Omaha", family: "Omaha", bomb_pot: true, pot_2_hand_rule: "high_standard")
+    Variant.create!(name: "Regular Omaha", family: "Omaha", bomb_pot: false)
+
+    get random_variant_path(bomb_pot: "Yes")
+
+    expect(response).to have_http_status(:redirect)
+    expect(response.location).to match(%r{/variants/#{bomb_pot_variant.id}\?style=(double_board|derailment)\z})
+  end
+
+  it "renders a randomized double-board style without changing the variant" do
+    bomb_pot_variant = Variant.create!(name: "Bomb Omaha", family: "Omaha", bomb_pot: true)
+
+    get variant_path(bomb_pot_variant, style: "double_board")
+
+    expect(response.body).to include("Bomb Omaha — Double Board", "Two boards are dealt", "POT #2")
+    expect(bomb_pot_variant.reload.modifiers).not_to include("double_board")
+  end
+
+  it "renders a randomized derailment style without changing the variant" do
+    bomb_pot_variant = Variant.create!(name: "Bomb Omaha", family: "Omaha", bomb_pot: true)
+
+    get variant_path(bomb_pot_variant, style: "derailment")
+
+    expect(response.body).to include("Bomb Omaha — Derailment", "Three boards are dealt", "POT #2")
+    expect(bomb_pot_variant.reload.modifiers).not_to include("derailment")
   end
 
   it "shows the complete rules and both forms" do

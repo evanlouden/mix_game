@@ -3,7 +3,7 @@ module HandRulesHelper
     rule = variant.public_send("pot_#{pot_number}_hand_rule")
     return if rule.blank?
 
-    Variant::HAND_RULE_LABELS.fetch(rule.to_s, rule.to_s.humanize)
+    Variant::HAND_RULES.fetch(rule.to_s, rule.to_s.humanize)
   end
 
   def variant_hand_qualifier_label(variant, pot_number)

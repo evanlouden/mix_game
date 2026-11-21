@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   root "variants#index"
   get "variants/random", to: "variants#random", as: :random_variant
   resources :variants do
+    member do
+      post :generate_flop_sequence
+      post :generate_stud_sequence
+    end
     resources :sequence_steps, only: %i[new create edit update destroy]
   end
   devise_for :users, skip: :registrations

@@ -6,9 +6,9 @@
     <div class="field wide"><%= form.label :name, "Name" %><%= form.text_field :name, required: true %></div>
     <div class="field wide betting-options-field"><%= form.label :no_limit, "Betting options" %><div class="betting-options-row"><div class="boolean-field"><%= form.check_box :no_limit %><%= form.label :no_limit, "No Limit" %></div><div class="boolean-field"><%= form.check_box :pot_limit %><%= form.label :pot_limit, "Pot Limit" %></div><div class="boolean-field"><%= form.check_box :fixed_limit %><%= form.label :fixed_limit, "Limit" %></div></div></div>
     <div class="field wide"><div class="boolean-field"><%= form.check_box :bomb_pot %><%= form.label :bomb_pot, "Bomb Pot" %></div></div>
-    <div class="field"><%= form.label :pot_1_hand_rule, "Pot 1 Hand Rule" %><%= form.select :pot_1_hand_rule, Variant::HAND_RULES.map { |value| [Variant::HAND_RULE_LABELS.fetch(value), value] }, { include_blank: "Select a hand rule" } %></div>
+    <div class="field"><%= form.label :pot_1_hand_rule, "Pot 1 Hand Rule" %><%= form.select :pot_1_hand_rule, Variant::HAND_RULES.map { |value, label| [label, value] }, { include_blank: "Select a hand rule" } %></div>
     <div class="field"><%= form.label :pot_1_qualifier, "Pot 1 Qualifier" %><%= form.select :pot_1_qualifier, Variant::POT_QUALIFIERS.sort_by { |_, label| label }.map { |value, label| [label, value] }, { include_blank: "No qualifier" } %></div>
-    <div class="field"><%= form.label :pot_2_hand_rule, "Pot 2 Hand Rule" %><%= form.select :pot_2_hand_rule, Variant::HAND_RULES.map { |value| [Variant::HAND_RULE_LABELS.fetch(value), value] }, { include_blank: "Select a hand rule" } %></div>
+    <div class="field"><%= form.label :pot_2_hand_rule, "Pot 2 Hand Rule" %><%= form.select :pot_2_hand_rule, Variant::HAND_RULES.map { |value, label| [label, value] }, { include_blank: "Select a hand rule" } %></div>
     <div class="field"><%= form.label :pot_2_qualifier, "Pot 2 Qualifier" %><%= form.select :pot_2_qualifier, Variant::POT_QUALIFIERS.sort_by { |_, label| label }.map { |value, label| [label, value] }, { include_blank: "No qualifier" } %></div>
     <div class="field wide"><%= form.label :special_mechanics, "Special Mechanics" %><%= form.text_area :special_mechanics, rows: 3 %></div>
   <% Variant::GROUPS.each_value do |fields| %>
@@ -24,6 +24,13 @@
           <% elsif field == :family %>
             <% options = field == :family ? Variant::FAMILIES : Variant::GAME_TYPES %>
             <%= form.select field, options | [variant.public_send(field)].compact, { include_blank: "Select an option" }, required: true %>
+          <% elsif field == :modifiers %>
+            <div class="checkbox-options">
+              <% Variant::MODIFIERS.each do |value, label| %>
+                <div class="boolean-field"><%= form.check_box :modifiers, { multiple: true, include_hidden: false, checked: variant.modifiers.to_a.include?(value) }, value %><%= form.label :modifiers, label, value: value %></div>
+                <% if Variant::MODIFIER_DESCRIPTIONS[value] %><small class="form-help modifier-help"><%= Variant::MODIFIER_DESCRIPTIONS[value] %></small><% end %>
+              <% end %>
+            </div>
           <% elsif Variant::LONG_FIELDS.include?(field) %>
             <%= form.text_area field, rows: 3 %>
           <% elsif field == :max_players %>

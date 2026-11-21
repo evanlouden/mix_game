@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 class SequenceStepsComponent < ApplicationComponent
-  def initialize(sequence: [])
+  def initialize(sequence: [], family: nil)
     @sequence = sequence || []
+    @family = family
   end
 
   private
 
-  attr_reader :sequence
+  attr_reader :sequence, :family
 
   def labels
     sequence.map.with_index do |event, index|
@@ -48,8 +49,37 @@ class SequenceStepsComponent < ApplicationComponent
     helpers.sequence_label_markup(label)
   end
 
-  def action_type(event)
+  def action_type(event, index)
+    if community_deal?(event)
+      return %w[Flop Turn River][community_deal_index(index)] || "Deal"
+    end
+
+    if family == "Stud" && stud_deal?(event)
+      street_index = stud_deal_index(index)
+      return "Deal" if street_index.zero?
+
+      return ["4th Street", "5th Street", "6th Street", "7th Street"][street_index - 1] || "Deal"
+    end
+
     event["action_type"].presence&.humanize || event["event_type"].to_s.humanize
+  end
+
+  def community_deal_index(index)
+    sequence.first(index + 1).count do |event|
+      community_deal?(event)
+    end - 1
+  end
+
+  def community_deal?(event)
+    event["event_type"].to_s == "deal" && event["community_card_count"].to_i.positive?
+  end
+
+  def stud_deal?(event)
+    family == "Stud" && event["event_type"].to_s == "deal" && event["community_card_count"].to_i.zero?
+  end
+
+  def stud_deal_index(index)
+    sequence.first(index + 1).count { |event| stud_deal?(event) } - 1
   end
 
   def card_range(min_cards, max_cards)

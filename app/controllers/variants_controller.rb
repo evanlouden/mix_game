@@ -1,8 +1,8 @@
 require "csv"
 
 class VariantsController < ApplicationController
-  before_action :set_variant, only: %i[show edit update destroy]
-  before_action :require_admin!, only: %i[new create edit update destroy]
+  before_action :set_variant, only: %i[show edit update destroy generate_flop_sequence generate_stud_sequence]
+  before_action :require_admin!, only: %i[new create edit update destroy generate_flop_sequence generate_stud_sequence]
 
   def index
     @total = Variant.count
@@ -25,19 +25,31 @@ class VariantsController < ApplicationController
   end
 
   def random
-    variant = Variant.filtered(params).reorder(Arel.sql("RANDOM()")).first
+    scope = params[:bomb_pot] == "Yes" ? Variant.bomb_pot_eligible : Variant.filtered(params)
+    variant = scope.reorder(Arel.sql("RANDOM()")).first
 
     if variant
-      redirect_to variant
+      style = Variant::BOARD_STYLE_COUNTS.keys.sample if variant.board_style_eligible?
+      redirect_to variant_path(variant, style: style)
     else
       redirect_to variants_path(request.query_parameters.except("action", "controller")), alert: "No variants match those filters."
     end
   end
 
   def show
+    @board_style = params[:style] if Variant::BOARD_STYLE_COUNTS.key?(params[:style]) && @variant.board_style_eligible?
+    @board_style_label = Variant::MODIFIERS[@board_style]
+    @derailment = @board_style == "derailment"
+    @effective_modifiers = @variant.modifiers.to_a.dup
+    @effective_modifiers << @board_style if @board_style && !@effective_modifiers.include?(@board_style)
+    @board_style_description = Variant::MODIFIER_DESCRIPTIONS[@board_style]
     @sequence = @variant.sequence_steps.map do |step|
       community_count = step.card_scope == "community" ? step.cards_up.to_i : 0
       board_count = step.number_of_boards.to_i
+      if @board_style && step.action_type == "deal" && step.card_scope == "community"
+        board_count = Variant::BOARD_STYLE_COUNTS[@board_style]
+        community_count *= board_count
+      end
       step_label = case step.action_type
       when "betting" then "Bet"
       when "draw" then "Draw"
@@ -72,6 +84,17 @@ class VariantsController < ApplicationController
   end
 
   def edit; end
+
+  def generate_flop_sequence
+    StandardFlopSequence.call(@variant)
+    redirect_to @variant, notice: "Standard flop sequence generated."
+  end
+
+  def generate_stud_sequence
+    StandardStudSequence.call(@variant)
+    redirect_to @variant, notice: "Standard stud sequence generated."
+  end
+
   def update
     if @variant.update(variant_params)
       redirect_to @variant, notice: "Variant updated."
@@ -92,7 +115,9 @@ class VariantsController < ApplicationController
   end
 
   def variant_params
-    params.require(:variant).permit(*Variant::FIELDS.keys)
+    permitted = params.require(:variant).permit(*Variant::FIELDS.keys, modifiers: [])
+    permitted[:modifiers] = permitted.fetch(:modifiers, []).reject(&:blank?)
+    permitted
   end
 
   def csv_value(value)

@@ -2,6 +2,7 @@ workbook = JSON.parse(Rails.root.join("db/data/workbook.json").read)
 Variant.transaction do
   workbook.fetch("variants").each_with_index do |row, index|
     next if row.values.any? { |value| value.to_s.match?(/Bug is wild/i) }
+    next if row["Variant"] == "Double-Board Omaha"
     source_id = workbook.fetch("model").fetch(index).fetch("variant_id")
     existing_variant = Variant.find_by(name: row["Variant"])
     next if existing_variant&.sequence_steps&.exists?
@@ -11,6 +12,7 @@ Variant.transaction do
     attributes[:fixed_limit] = betting_category.match?(/Fixed-Limit/i)
     attributes[:pot_limit] = betting_category.match?(/Pot-Limit/i)
     attributes[:no_limit] = !attributes[:fixed_limit] && !attributes[:pot_limit]
+    attributes[:modifiers] = ["double_board"] if row["Variant"] == "Omaha"
     if attributes[:max_players].blank?
       match = attributes[:special_mechanics].to_s.match(/(\d+)\s+Players?\s+Max/i)
       attributes[:max_players] = match[1] if match

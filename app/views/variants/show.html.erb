@@ -1,18 +1,34 @@
-<% content_for :title, "#{@variant.name} — The Mix" %>
+<% content_for :title, "#{@variant.name}#{" — #{@board_style_label}" if @board_style_label} — The Mix" %>
 <div class="detail-toolbar"><%= link_to "← Back to library", variants_path, class: "back-link" %></div>
 
-<article class="pdf-card" aria-label="<%= @variant.name %>">
+<article class="pdf-card" aria-label="<%= @variant.name %><%= " — #{@board_style_label}" if @board_style_label %>">
   <div class="pdf-card-top"><span></span><span class="player-limit"><span class="player-limit-number"><%= @variant.max_players.presence || "—" %></span><span class="player-limit-label">players</span></span></div>
-  <div class="pdf-card-title"><span class="pdf-suit"><%= { "Draw" => "♣", "Hold'em" => "♠", "Omaha" => "♦", "Stud" => "♥" }.fetch(@variant.family, "♠") %></span><div><h2><%= @variant.name %></h2></div></div>
+  <div class="pdf-card-title"><span class="pdf-suit"><%= { "Draw" => "♣", "Hold'em" => "♠", "Omaha" => "♦", "Stud" => "♥" }.fetch(@variant.family, "♠") %></span><div><h2><%= @variant.name %><%= tag.span " — #{@board_style_label}", class: "derailment-title" if @board_style_label %></h2></div></div>
   <div class="pdf-card-rule"></div>
-  <div class="pdf-card-badges"><span><%= @variant.betting_format_display.upcase %></span><% if @variant.pot_2_hand_rule.present? %><span>Split Pot</span><% end %><span><%= @variant.forced_bet.presence || "No forced bet specified" %></span><% if @variant.bring_in.present? && @variant.bring_in != "none" %><span>Bring-In<%= " (High)" if @variant.bring_in == "high" %></span><% end %></div>
-  <div class="pdf-sequence"><%= render SequenceStepsComponent.new(sequence: @sequence || []) %></div>
+  <div class="pdf-card-badges"><span><%= @variant.betting_format_display.upcase %></span><% @effective_modifiers.each do |modifier| %><span><%= Variant::MODIFIERS.fetch(modifier, modifier.to_s.humanize) %></span><% end %><% if @variant.pot_2_hand_rule.present? %><span>Split Pot</span><% end %><span><%= @variant.forced_bet.presence || "No forced bet specified" %></span><% if @variant.bring_in.present? && @variant.bring_in != "none" %><span>Bring-In<%= " (High)" if @variant.bring_in == "high" %></span><% end %></div>
+  <div class="pdf-sequence"><%= render SequenceStepsComponent.new(sequence: @sequence || [], family: @variant.family) %></div>
   <% pot_rules = [1, 2].filter_map { |pot| label = variant_hand_rule_label(@variant, pot); qualifier = variant_hand_qualifier_label(@variant, pot); label.present? ? [pot, label, qualifier] : nil } %>
+  <% pot_rules << [2, pot_rules.first[1], pot_rules.first[2]] if @board_style && pot_rules.one? %>
   <div class="pdf-pot-grid"><% pot_rules.each do |pot, label, qualifier| %><div class="pdf-pot-cell"><p class="pdf-label pot-label">POT #<%= pot %></p><p class="final-hand-rule"><%= label %></p><%= tag.p qualifier, class: "final-hand-qualifier" if qualifier.present? %></div><% end %></div>
-  <div class="pdf-card-columns"><div><p class="pdf-label">SPECIAL MECHANICS</p><p><%= @variant.special_mechanics %></p></div></div>
+  <div class="pdf-card-columns"><div><p class="pdf-label">SPECIAL MECHANICS</p><%= tag.p @variant.special_mechanics if @variant.special_mechanics.present? %><% if @board_style %><div class="derailment-explanation"><p class="derailment-heading"><span aria-hidden="true">•</span> <%= @board_style_label %></p><p><%= @board_style_description %></p></div><% end %></div></div>
 </article>
 
 <% if current_user %>
-  <% if @variant.sequence_steps.exists? %><section id="sequence-steps" class="detail-attributes sequence-attributes"><div class="section-heading"><p class="eyebrow">SEQUENCE STEPS</p><%= link_to "Add sequence step", new_variant_sequence_step_path(@variant), class: "button secondary" if current_user.admin? %></div><table><thead><tr><th>Position</th><th>Action Type</th><th>Card Scope</th><th>Boards</th><th>Down</th><th>Up</th><th>Min Cards</th><th>Max Cards</th><% if current_user.admin? %><th>Edit</th><% end %></tr></thead><tbody><% @variant.sequence_steps.each do |step| %><tr><th scope="row"><%= step.position %></th><td><%= step.action_type %></td><td><%= step.card_scope %></td><td><%= step.number_of_boards %></td><td><%= step.cards_down %></td><td><%= step.cards_up %></td><td><%= step.min_cards %></td><td><%= step.max_cards %></td><% if current_user.admin? %><td><%= link_to "Edit", edit_variant_sequence_step_path(@variant, step), class: "table-action" %></td><% end %></tr><% end %></tbody></table></section><% else %><section id="sequence-steps" class="detail-attributes sequence-attributes"><div class="section-heading"><p class="eyebrow">SEQUENCE STEPS</p><%= link_to "Add sequence step", new_variant_sequence_step_path(@variant), class: "button secondary" if current_user.admin? %></div></section><% end %>
+  <% sequence_replacement_warning = @variant.sequence_steps.exists? ? "This will replace the current sequence. Continue?" : nil %>
+  <section id="sequence-steps" class="detail-attributes sequence-attributes">
+    <div class="section-heading">
+      <p class="eyebrow">SEQUENCE STEPS</p>
+      <% if current_user.admin? %>
+        <div class="sequence-actions">
+          <%= button_to "Generate flop sequence", generate_flop_sequence_variant_path(@variant), method: :post, class: "button secondary", form: { data: { turbo_confirm: sequence_replacement_warning } } %>
+          <%= button_to "Generate stud sequence", generate_stud_sequence_variant_path(@variant), method: :post, class: "button secondary", form: { data: { turbo_confirm: sequence_replacement_warning } } %>
+          <%= link_to "Add sequence step", new_variant_sequence_step_path(@variant), class: "button secondary" %>
+        </div>
+      <% end %>
+    </div>
+    <% if @variant.sequence_steps.exists? %>
+      <table><thead><tr><th>Position</th><th>Action Type</th><th>Card Scope</th><th>Boards</th><th>Down</th><th>Up</th><th>Min Cards</th><th>Max Cards</th><% if current_user.admin? %><th>Edit</th><% end %></tr></thead><tbody><% @variant.sequence_steps.each do |step| %><tr><th scope="row"><%= step.position %></th><td><%= step.action_type %></td><td><%= step.card_scope %></td><td><%= step.number_of_boards %></td><td><%= step.cards_down %></td><td><%= step.cards_up %></td><td><%= step.min_cards %></td><td><%= step.max_cards %></td><% if current_user.admin? %><td><%= link_to "Edit", edit_variant_sequence_step_path(@variant, step), class: "table-action" %></td><% end %></tr><% end %></tbody></table>
+    <% end %>
+  </section>
   <section class="detail-attributes"><div class="section-heading"><p class="eyebrow">VARIANT ATTRIBUTES</p><%= link_to "Edit variant ↗", edit_variant_path(@variant), class: "button primary" if current_user.admin? %></div><table><thead><tr><th>Attribute</th><th>Value</th></tr></thead><tbody><% Variant::FIELDS.keys.sort_by(&:to_s).each do |field| %><tr><th scope="row"><%= field %></th><td><%= @variant.public_send(field).presence || "Not specified" %></td></tr><% end %></tbody></table></section>
 <% end %>
